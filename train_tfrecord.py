@@ -55,8 +55,14 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_plac
     print('Start Session')
     sess.run(init)
     sess.run(local_init)
-    writer = tf.summary.FileWriter( os.path.join(FLAGS.checkpointDir, 'tensorboard/'+FLAGS.exp+'/train/'), sess.graph)
-    twriter = tf.summary.FileWriter( os.path.join(FLAGS.checkpointDir, 'tensorboard/'+FLAGS.exp+'/test/'), sess.graph)
+    writer = tf.summary.FileWriter(
+        os.path.join(FLAGS.checkpointDir, f'tensorboard/{FLAGS.exp}/train/'),
+        sess.graph,
+    )
+    twriter = tf.summary.FileWriter(
+        os.path.join(FLAGS.checkpointDir, f'tensorboard/{FLAGS.exp}/test/'),
+        sess.graph,
+    )
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
     step = 0
@@ -64,7 +70,7 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_plac
         print('Start Train')
         while not coord.should_stop():
             with utils.log_time() as log:
-                for i in range(2):
+                for _ in range(2):
                     Xone, X1, X2, Rcate_list, final_out, fc2, loss_v, X, X_last, label_oh, pred_logit, positive_score, pred_binary, label_value, summary, _, step = sess.run([m.Xone, m.X1, m.X2, m.Rcate_list, m.final_out, m.fc2, m.loss, m.X, m.X_last, m.label_oh, m.pred_logit, m.positive_score, m.pred_binary, m.label_value, m.summary_op, m.optimizer, m.global_step], options=run_options, run_metadata=run_metadata)
                 log.write(u'iteration: %d'%step)
                 print ('loss:', loss_v)
@@ -74,9 +80,13 @@ with tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_plac
                 twriter.add_summary(summary, step)
 
             if step>1 and step%4000 == 0:
-                ckp_path = os.path.join(FLAGS.checkpointDir, 'model_saved', str(step)+'_model.ckpt')
+                ckp_path = os.path.join(
+                    FLAGS.checkpointDir,
+                    'model_saved',
+                    f'{str(step)}_model.ckpt',
+                )
                 path = saver.save(sess, ckp_path, step)
-                print ('model saved at {}'.format(path))
+                print(f'model saved at {path}')
     except:
         traceback.print_exc(file=sys.stdout)
     finally:

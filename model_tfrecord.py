@@ -67,14 +67,13 @@ class Seq2Point:
     def __add_summary__(self, name):
         print('summary')
         summary = [
-            tf.summary.scalar(name + '/loss', self.loss),
-            tf.summary.scalar(name + '/metrics/acc', self.acc),
-            tf.summary.scalar(name + '/metrics/precision', self.precision),
-            tf.summary.scalar(name + '/metrics/recall', self.recall),
-            tf.summary.scalar(name + '/metrics/auc', self.auc),
+            tf.summary.scalar(f'{name}/loss', self.loss),
+            tf.summary.scalar(f'{name}/metrics/acc', self.acc),
+            tf.summary.scalar(f'{name}/metrics/precision', self.precision),
+            tf.summary.scalar(f'{name}/metrics/recall', self.recall),
+            tf.summary.scalar(f'{name}/metrics/auc', self.auc),
         ]
-        summary_op = tf.summary.merge(summary)
-        return summary_op
+        return tf.summary.merge(summary)
 
     def __evaluation__(self):
         print('evaluation')
@@ -131,7 +130,7 @@ class Seq2Point:
             self.X2 = self.X[-2]
 
             #####       Encoder Level       #####
-            
+
             fw_cell = tf.contrib.rnn.GRUCell(num_units=self.rnn_cell_dim)
             bw_cell = tf.contrib.rnn.GRUCell(num_units=self.rnn_cell_dim)
 
@@ -165,8 +164,7 @@ class Seq2Point:
             #####       Dense Classification    #####
             self.fc1 = tf.layers.dense(self.final_out, self.dense_dim, activation=tf.nn.relu, name='fc1', kernel_initializer = tf.random_normal_initializer())
             self.fc2 = tf.layers.dense(self.fc1, 2, activation=None, name='fc2')
-            pred_logit = tf.nn.softmax(self.fc2)
-            return pred_logit
+            return tf.nn.softmax(self.fc2)
 
     def __load_data__(self):
         # pos,neg sample combine     by muming
